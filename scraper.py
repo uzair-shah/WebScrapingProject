@@ -28,12 +28,8 @@ while True:
         name = book.find('h3').find('a')['title'] #name of book
         price = float(book.find('div', class_ = 'product_price').find('p', class_ = 'price_color').text.strip("£")) #book price
         in_stock = book.find('p', class_ = 'instock availability').text.strip() #instock
-        
         rating_words = book.find('p')['class'][1] #star rating
-        rating = 0
-        if rating_words in word_2_num: #Converting to integer value
-            rating = word_2_num[rating_words]
-
+        rating = word_2_num.get(rating_words,0)
         rel_link = book.find('div',class_ = 'image_container').find('a').find('img')['src'] #relative link
         link = urljoin(url,rel_link)
         data.append({'name':name, 
@@ -49,9 +45,7 @@ df = pd.DataFrame(data)
 
 
 #Linking dataframe to sql 
-conn = sqlite3.connect("books.db" ) #connection to an SQLite database called books.
-
-with sqlite3.connect("books.db") as conn:
+with sqlite3.connect("books.db") as conn:#connection to an SQLite database called books.
     df.to_sql('books',conn, if_exists = "replace",index = False)
 
     #Checking if sql query works
